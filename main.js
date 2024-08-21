@@ -133,25 +133,25 @@ const urlBase64ToUint8Array = (base64String) => {
 }
 
 const getApplicationServerKey = () => {
-    console.log("Fetching VAPID Key from:", `${serverUrl}/key`);
-
     return fetch(`${serverUrl}/key`)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`Failed to fetch VAPID key. Status: ${res.status}`);
-            }
-            return res.text(); // Expecting the VAPID key as a base64 string
-        })
-        .then(base64Key => {
-            console.log("Fetched VAPID Key (Base64):", base64Key);
-            const applicationServerKey = urlBase64ToUint8Array(base64Key);
-            console.log("Converted VAPID Key (Uint8Array):", applicationServerKey);
-            return applicationServerKey;
-        })
-        .catch(error => {
-            console.error("Error fetching VAPID Key:", error); // Log any errors
-        });
+      .then(res => res.text())  // Fetch the key as text
+      .then(key => {
+          console.log("Fetched VAPID Key (base64):", key);
+          
+          // Decode base64 string into Uint8Array
+          const padding = '='.repeat((4 - key.length % 4) % 4);
+          const base64 = (key + padding).replace(/\-/g, '+').replace(/_/g, '/');
+          const rawData = window.atob(base64);
+          const outputArray = new Uint8Array(rawData.length);
+
+          for (let i = 0; i < rawData.length; ++i) {
+              outputArray[i] = rawData.charCodeAt(i);
+          }
+          console.log("Decoded VAPID Key (Uint8Array):", outputArray);
+          return outputArray;
+      });
 };
+
 
 
 
