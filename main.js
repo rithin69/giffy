@@ -1,6 +1,6 @@
 let swReg;
 
-const serverUrl = 'https://b08c-2001-630-d0-5009-608e-9ae1-2722-c2c7.ngrok-free.app';
+const serverUrl = 'https://a8c3-185-3-86-208.ngrok-free.app';
 
 
 
