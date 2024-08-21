@@ -120,26 +120,41 @@ function update() {
 $('#update a').click(update);
 
 const urlBase64ToUint8Array = (base64String) => {
+    // Ensure the string has the correct padding
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-    const rawData = atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    try {
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    } catch (e) {
+        console.error("Error decoding Base64 string:", e);
+        return null;
     }
-    return outputArray;
 };
+
 
 
 const getApplicationServerKey = () => {
     return fetch(`${serverUrl}/key`)
-        .then(res => res.text())
+        .then(res => res.text())  // Fetch as text instead of arrayBuffer
         .then(key => {
-            const uint8Key = urlBase64ToUint8Array(key);
-            console.log("Uint8Array Key Length:", uint8Key.length);  // Should be 65
+            console.log("Fetched VAPID Key (Base64):", key);
+            return urlBase64ToUint8Array(key);  // Convert Base64 string to Uint8Array
+        })
+        .then(uint8Key => {
+            console.log("Converted VAPID Key (Uint8Array):", uint8Key);
             return uint8Key;
         });
 };
+
 
 
 
