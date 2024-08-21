@@ -1,4 +1,5 @@
 const webpush = require('web-push');
+const urlsafeBase64 = require('urlsafe-base64');
 const Storage = require('node-storage');
 
 // Vapid Keys
@@ -10,7 +11,7 @@ console.log("VAPID Private Key:", vapid.privateKey);
 
 // Configure web-push
 webpush.setVapidDetails(
-  'mailto:ray@stackacademy.tv', // Replace with your email
+  'mailto:ray@stackacademy.tv',
   vapid.publicKey,
   vapid.privateKey
 );
@@ -19,10 +20,11 @@ webpush.setVapidDetails(
 const store = new Storage(`${__dirname}/db`);
 let subscriptions = store.get('subscriptions') || [];
 
-// Return the VAPID public key as is
+// Create URL safe vapid public key
 module.exports.getKey = () => {
-  console.log("Serving VAPID Public Key:", vapid.publicKey); // Log the public key whenever it's served
-  return vapid.publicKey;
+  const publicKey = urlsafeBase64.decode(vapid.publicKey);
+  console.log("Serving VAPID Public Key:", publicKey.toString('base64')); // Log the public key whenever it's served
+  return publicKey;
 };
 
 // Store new subscription
@@ -40,7 +42,7 @@ module.exports.send = (message) => {
   // Notification promises
   let notifications = [];
 
-  // Loop through subscriptions
+  // Loop subscriptions
   subscriptions.forEach((subscription, i) => {
     // Send Notification
     let p = webpush.sendNotification(subscription, message)
@@ -57,10 +59,10 @@ module.exports.send = (message) => {
 
   // Clean subscriptions marked for deletion
   Promise.all(notifications).then(() => {
-    // Filter subscriptions to remove those marked for deletion
+    // Filter subscriptions
     subscriptions = subscriptions.filter(subscription => !subscription.delete);
 
-    // Persist the cleaned subscriptions
+    // Persist 'cleaned' subscriptions
     store.put('subscriptions', subscriptions);
     console.log('Subscriptions cleaned, remaining subscriptions:', subscriptions.length);  // Log the cleanup process
   });
