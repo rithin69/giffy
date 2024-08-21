@@ -7,6 +7,15 @@ http.createServer((request, response) => {
 
   // Enable CORS for cross-origin requests
   response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle CORS preflight requests
+  if (request.method === 'OPTIONS') {
+    response.writeHead(200);
+    response.end();
+    return;
+  }
 
   // Get the URL and HTTP method of the request
   const { url, method } = request;
