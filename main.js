@@ -130,15 +130,18 @@ const urlBase64ToUint8Array = (base64String) => {
     return outputArray;
 };
 
+
 const getApplicationServerKey = () => {
     return fetch(`${serverUrl}/key`)
-        .then(res => res.text())  // Fetch as text instead of arrayBuffer
-        .then(key => urlBase64ToUint8Array(key))  // Convert Base64 string to Uint8Array
-        .then(uint8Key => {
-            console.log("Fetched VAPID Key (Uint8Array):", uint8Key);
+        .then(res => res.text())
+        .then(key => {
+            const uint8Key = urlBase64ToUint8Array(key);
+            console.log("Uint8Array Key Length:", uint8Key.length);  // Should be 65
             return uint8Key;
         });
 };
+
+
 
 // Helper function to check if a string is a valid Base64
 const isValidBase64 = (str) => {
