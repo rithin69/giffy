@@ -2,11 +2,6 @@ let swReg;
 
 const serverUrl = 'https://3304-185-3-86-208.ngrok-free.app';
 
-
-
-
-
-
 // Send a message to the Service Worker to load images from the cache
 function loadCapturedImages() {
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
@@ -36,9 +31,6 @@ function saveImage(encryptedImageData) {
     }
 }
 
-// The rest of your existing `main.js` code...
-
-
 // Giphy cache clean
 function giphyCacheClean(giphys) {
     console.log('Giphys:', giphys);
@@ -55,23 +47,19 @@ function giphyCacheClean(giphys) {
 }
 
 // Update UI for subscribed status
-// Update UI for subscribed status
 const setSubscribedStatus = (state) => {
     const subscribeButton = document.getElementById('subscribe-button');
 
     if (state) {
-        // Change the button to "Unsubscribe"
         subscribeButton.textContent = 'Unsubscribe';
         subscribeButton.style.backgroundColor = '#EB3F2F'; // Change to red color for "Unsubscribe"
         subscribeButton.onclick = unsubscribe; // Change click event to unsubscribe
     } else {
-        // Change the button to "Subscribe"
         subscribeButton.textContent = 'Subscribe';
         subscribeButton.style.backgroundColor = '#66DE93'; // Change to green color for "Subscribe"
         subscribeButton.onclick = subscribe; // Change click event to subscribe
     }
 };
-
 
 // Progressive Enhancement
 if (navigator.serviceWorker) {
@@ -139,9 +127,6 @@ const urlBase64ToUint8Array = (base64String) => {
     }
 };
 
-
-
-
 const getApplicationServerKey = () => {
     return fetch(`${serverUrl}/key`)
         .then(res => res.text())  // Fetch as text
@@ -159,26 +144,6 @@ const getApplicationServerKey = () => {
             throw error;  // Rethrow the error to be caught by the caller
         });
 };
-
-
-
-
-
-
-// Helper function to check if a string is a valid Base64
-const isValidBase64 = (str) => {
-    try {
-        return btoa(atob(str)) === str;
-    } catch (err) {
-        return false;
-    }
-};
-
-
-
-
-
-
 
 const unsubscribe = () => {
     if (!swReg) return console.error('Service Worker Registration Not Found');
