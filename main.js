@@ -1,6 +1,6 @@
 let swReg;
 
-const serverUrl = 'https://9eae-185-3-86-208.ngrok-free.app';
+const serverUrl = 'https://3304-185-3-86-208.ngrok-free.app';
 
 
 
@@ -121,36 +121,45 @@ function update() {
 $('#update a').click(update);
 
 const urlBase64ToUint8Array = (base64String) => {
-    // Ensure the string has the correct padding
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
-        .replace(/\-/g, '+')
+        .replace(/-/g, '+')
         .replace(/_/g, '/');
-
+    
     try {
-        const rawData = window.atob(base64);
+        const rawData = atob(base64);
         const outputArray = new Uint8Array(rawData.length);
-
         for (let i = 0; i < rawData.length; ++i) {
             outputArray[i] = rawData.charCodeAt(i);
         }
         return outputArray;
     } catch (e) {
         console.error("Error decoding Base64 string:", e);
-        return null;
+        return null;  // Return null if decoding fails
     }
 };
 
 
 
+
 const getApplicationServerKey = () => {
     return fetch(`${serverUrl}/key`)
-        .then(res => res.text())  // Fetch as text instead of arrayBuffer
+        .then(res => res.text())  // Fetch as text
         .then(key => {
-            console.log("Fetched VAPID Key (Base64):", key);  // Log the fetched key
-            return urlBase64ToUint8Array(key);  // Convert Base64 string to Uint8Array
+            console.log("Fetched VAPID Key (Base64):", key);
+            const uint8Key = urlBase64ToUint8Array(key);
+            if (!uint8Key) {
+                throw new Error('Invalid Base64 VAPID Key');
+            }
+            console.log("Converted VAPID Key (Uint8Array):", uint8Key);
+            return uint8Key;
+        })
+        .catch(error => {
+            console.error("Failed to fetch or convert VAPID Key:", error);
+            throw error;  // Rethrow the error to be caught by the caller
         });
 };
+
 
 
 
