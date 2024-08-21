@@ -1,62 +1,70 @@
 // Modules
-const http = require('http')
-const push = require('./push')
+const http = require('http');
+const push = require('./push');
 
 // Create HTTP Server
-http.createServer( (request, response) => {
+http.createServer((request, response) => {
 
   // Enable CORS
-  response.setHeader('Access-Control-Allow-Origin', '*')
+  response.setHeader('Access-Control-Allow-Origin', '*');
 
   // Get request vars
-  const { url, method } = request
+  const { url, method } = request;
 
   // Subscribe
-  if ( method === 'POST' && url.match(/^\/subscribe\/?/) ) {
+  if (method === 'POST' && url.match(/^\/subscribe\/?/)) {
 
     // Get POST Body
-    let body = []
+    let body = [];
 
     // Read body stream
-    request.on( 'data', chunk => body.push(chunk) ).on( 'end', () => {
+    request.on('data', chunk => body.push(chunk)).on('end', () => {
 
       // Parse subscription body to object
-      let subscription = JSON.parse(body.toString())
+      let subscription = JSON.parse(body.toString());
+
+      // Log the subscription data
+      console.log('New Subscription:', subscription);
 
       // Store subscription for push notifications
-      push.addSubscription( subscription )
+      push.addSubscription(subscription);
 
       // Respond
-      response.end('Subscribed')
-    })
+      response.end('Subscribed');
+    });
 
   // Public Key
-  } else if ( url.match(/^\/key\/?/) ) {
+  } else if (url.match(/^\/key\/?/)) {
+
+    // Fetch the public VAPID key
+    const vapidKey = push.getKey();
+
+    // Log the public VAPID key
+    console.log('VAPID Public Key:', vapidKey);
 
     // Respond with public key from push module
-    response.end( push.getKey() )
+    response.end(vapidKey);
 
   // Push Notification
-  } else if ( method === 'POST' && url.match(/^\/push\/?/) ) {
+  } else if (method === 'POST' && url.match(/^\/push\/?/)) {
 
     // Get POST Body
-    let body = []
+    let body = [];
 
     // Read body stream
-    request.on( 'data', chunk => body.push(chunk) ).on( 'end', () => {
+    request.on('data', chunk => body.push(chunk)).on('end', () => {
 
       // Send notification with POST body
-      push.send( body.toString() )
+      push.send(body.toString());
 
       // Respond
-      response.end('Push Sent')
-    })
+      response.end('Push Sent');
+    });
+  
   // Not Found
-} else {
+  } else {
+    response.statusCode = 404;
+    response.end('Error: Unknown Request');
+  }
 
-  response.status = 404
-  response.end('Error: Unknown Request')
-}
-
-// Start the Server
-}).listen( 3333, () => { console.log('Server Running') })
+}).listen(3333, () => { console.log('Server Running') });
