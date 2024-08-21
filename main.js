@@ -146,14 +146,11 @@ const getApplicationServerKey = () => {
     return fetch(`${serverUrl}/key`)
         .then(res => res.text())  // Fetch as text instead of arrayBuffer
         .then(key => {
-            console.log("Fetched VAPID Key (Base64):", key);
+            console.log("Fetched VAPID Key (Base64):", key);  // Log the fetched key
             return urlBase64ToUint8Array(key);  // Convert Base64 string to Uint8Array
-        })
-        .then(uint8Key => {
-            console.log("Converted VAPID Key (Uint8Array):", uint8Key);
-            return uint8Key;
         });
 };
+
 
 
 
