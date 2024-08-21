@@ -4,7 +4,7 @@ const push = require('./push');
 // Create HTTP Server
 http.createServer((request, response) => {
   // Enable CORS for cross-origin requests
-  response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Origin', 'https://rithin69.github.io');
   response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
