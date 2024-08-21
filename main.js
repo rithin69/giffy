@@ -117,25 +117,42 @@ function update() {
 // Manual refresh
 $('#update a').click(update);
 
+const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
 const getApplicationServerKey = () => {
     console.log("Fetching VAPID Key from:", `${serverUrl}/key`);
-    
+
     return fetch(`${serverUrl}/key`)
-      .then(res => {
-          if (!res.ok) {
-              throw new Error(`Failed to fetch VAPID key. Status: ${res.status}`);
-          }
-          return res.arrayBuffer();
-      })
-      .then(key => {
-          const applicationServerKey = new Uint8Array(key);
-          console.log("Fetched VAPID Key (Uint8Array):", applicationServerKey); // Log the VAPID key
-          return applicationServerKey;
-      })
-      .catch(error => {
-          console.error("Error fetching VAPID Key:", error); // Log any errors
-      });
-}
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Failed to fetch VAPID key. Status: ${res.status}`);
+            }
+            return res.text(); // Expecting the VAPID key as a base64 string
+        })
+        .then(base64Key => {
+            console.log("Fetched VAPID Key (Base64):", base64Key);
+            const applicationServerKey = urlBase64ToUint8Array(base64Key);
+            console.log("Converted VAPID Key (Uint8Array):", applicationServerKey);
+            return applicationServerKey;
+        })
+        .catch(error => {
+            console.error("Error fetching VAPID Key:", error); // Log any errors
+        });
+};
+
 
 
 
