@@ -109,6 +109,7 @@ function update() {
 $('#update a').click(update);
 
 const urlBase64ToUint8Array = (base64String) => {
+    console.log("Converting Base64 to Uint8Array:", base64String);  // Add log
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
         .replace(/-/g, '+')
@@ -120,6 +121,7 @@ const urlBase64ToUint8Array = (base64String) => {
         for (let i = 0; i < rawData.length; ++i) {
             outputArray[i] = rawData.charCodeAt(i);
         }
+        console.log("Conversion successful:", outputArray);  // Log success
         return outputArray;
     } catch (e) {
         console.error("Error decoding Base64 string:", e);
@@ -128,15 +130,21 @@ const urlBase64ToUint8Array = (base64String) => {
 };
 
 const getApplicationServerKey = () => {
+    console.log("Fetching VAPID Key from:", `${serverUrl}/key`);  // Log the fetch URL
     return fetch(`${serverUrl}/key`)
-        .then(res => res.text())  // Fetch as text
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.text();
+        })
         .then(key => {
-            console.log("Fetched VAPID Key (Base64):", key);
+            console.log("Fetched VAPID Key (Base64):", key);  // Log the fetched key
             const uint8Key = urlBase64ToUint8Array(key);
             if (!uint8Key) {
                 throw new Error('Invalid Base64 VAPID Key');
             }
-            console.log("Converted VAPID Key (Uint8Array):", uint8Key);
+            console.log("Converted VAPID Key (Uint8Array):", uint8Key);  // Log the Uint8Array
             return uint8Key;
         })
         .catch(error => {
