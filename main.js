@@ -118,10 +118,26 @@ function update() {
 $('#update a').click(update);
 
 const getApplicationServerKey = () => {
+    console.log("Fetching VAPID Key from:", `${serverUrl}/key`);
+    
     return fetch(`${serverUrl}/key`)
-      .then(res => res.arrayBuffer())
-      .then(key => new Uint8Array(key));
+      .then(res => {
+          if (!res.ok) {
+              throw new Error(`Failed to fetch VAPID key. Status: ${res.status}`);
+          }
+          return res.arrayBuffer();
+      })
+      .then(key => {
+          const applicationServerKey = new Uint8Array(key);
+          console.log("Fetched VAPID Key (Uint8Array):", applicationServerKey); // Log the VAPID key
+          return applicationServerKey;
+      })
+      .catch(error => {
+          console.error("Error fetching VAPID Key:", error); // Log any errors
+      });
 }
+
+
 
 const unsubscribe = () => {
     if (!swReg) return console.error('Service Worker Registration Not Found');
