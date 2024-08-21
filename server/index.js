@@ -29,11 +29,14 @@ http.createServer((request, response) => {
     });
   }
   // Handle requests to retrieve the VAPID public key
-  else if (method === 'GET' && url.match(/^\/key\/?/)) {
-    const vapidKey = push.getKey();
-    console.log('VAPID Public Key:', vapidKey);
-    response.end(vapidKey);
-  }
+// Handle requests to retrieve the VAPID public key
+else if (method === 'GET' && url.match(/^\/key\/?/)) {
+  const vapidKey = push.getKey();
+  console.log('VAPID Public Key:', vapidKey);
+  response.setHeader('Content-Type', 'text/plain');  // Set Content-Type to text/plain
+  response.end(vapidKey);
+}
+
   // Handle requests to send a push notification
   else if (method === 'POST' && url.match(/^\/push\/?/)) {
     let body = [];
