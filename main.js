@@ -137,7 +137,12 @@ const getApplicationServerKey = () => {
       .then(res => res.text())  // Fetch the key as text
       .then(key => {
           console.log("Fetched VAPID Key (base64):", key);
-          
+
+          // Validate base64 string before decoding
+          if (!isValidBase64(key)) {
+              throw new Error("Invalid base64 VAPID Key");
+          }
+
           // Decode base64 string into Uint8Array
           const padding = '='.repeat((4 - key.length % 4) % 4);
           const base64 = (key + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -149,8 +154,21 @@ const getApplicationServerKey = () => {
           }
           console.log("Decoded VAPID Key (Uint8Array):", outputArray);
           return outputArray;
+      })
+      .catch(err => {
+          console.error("Error fetching VAPID Key:", err);
       });
 };
+
+// Helper function to check if a string is a valid Base64
+const isValidBase64 = (str) => {
+    try {
+        return btoa(atob(str)) === str;
+    } catch (err) {
+        return false;
+    }
+};
+
 
 
 
