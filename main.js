@@ -4,6 +4,8 @@ const serverUrl = 'https://b08c-2001-630-d0-5009-608e-9ae1-2722-c2c7.ngrok-free.
 
 
 
+
+
 // Send a message to the Service Worker to load images from the cache
 function loadCapturedImages() {
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
@@ -119,45 +121,23 @@ $('#update a').click(update);
 
 const urlBase64ToUint8Array = (base64String) => {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-        .replace(/\-/g, '+')
-        .replace(/_/g, '/');
-
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
     const rawData = atob(base64);
     const outputArray = new Uint8Array(rawData.length);
-
     for (let i = 0; i < rawData.length; ++i) {
         outputArray[i] = rawData.charCodeAt(i);
     }
     return outputArray;
-}
+};
 
 const getApplicationServerKey = () => {
     return fetch(`${serverUrl}/key`)
-      .then(res => res.text())  // Fetch the key as text
-      .then(key => {
-          console.log("Fetched VAPID Key (base64):", key);
-
-          // Validate base64 string before decoding
-          if (!isValidBase64(key)) {
-              throw new Error("Invalid base64 VAPID Key");
-          }
-
-          // Decode base64 string into Uint8Array
-          const padding = '='.repeat((4 - key.length % 4) % 4);
-          const base64 = (key + padding).replace(/\-/g, '+').replace(/_/g, '/');
-          const rawData = window.atob(base64);
-          const outputArray = new Uint8Array(rawData.length);
-
-          for (let i = 0; i < rawData.length; ++i) {
-              outputArray[i] = rawData.charCodeAt(i);
-          }
-          console.log("Decoded VAPID Key (Uint8Array):", outputArray);
-          return outputArray;
-      })
-      .catch(err => {
-          console.error("Error fetching VAPID Key:", err);
-      });
+        .then(res => res.text())  // Fetch as text instead of arrayBuffer
+        .then(key => urlBase64ToUint8Array(key))  // Convert Base64 string to Uint8Array
+        .then(uint8Key => {
+            console.log("Fetched VAPID Key (Uint8Array):", uint8Key);
+            return uint8Key;
+        });
 };
 
 // Helper function to check if a string is a valid Base64
@@ -189,16 +169,12 @@ const unsubscribe = () => {
 const subscribe = () => {
     if (!swReg) return console.error('Service Worker Registration Not Found');
     getApplicationServerKey().then(applicationServerKey => {
-        swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
-            .then(res => res.toJSON())
-            .then(subscription => {
-                fetch(`${serverUrl}/subscribe`, { method: 'POST', body: JSON.stringify(subscription) })
-                    .then(() => setSubscribedStatus(true))
-                    .catch(unsubscribe);
-            })
-            .catch(console.error);
-    });
-}
+        return swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
+    }).then(subscription => {
+        console.log('Subscription successful:', subscription);
+        // Send the subscription to the server
+    }).catch(console.error);
+};
 
 // Show Toast Message
 function showToast(message) {

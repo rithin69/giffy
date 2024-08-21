@@ -22,10 +22,10 @@ let subscriptions = store.get('subscriptions') || [];
 
 // Create URL safe vapid public key
 module.exports.getKey = () => {
-  const publicKey = urlsafeBase64.decode(vapid.publicKey);
-  console.log("Serving VAPID Public Key:", publicKey.toString('base64')); // Log the public key whenever it's served
-  return publicKey;
+  console.log("Serving VAPID Public Key:", vapid.publicKey); // Log the public key whenever it's served
+  return vapid.publicKey;  // Return the key without decoding it
 };
+
 
 // Store new subscription
 module.exports.addSubscription = (subscription) => {
