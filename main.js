@@ -1,6 +1,6 @@
 let swReg;
 
-const serverUrl = 'https://fd20-185-3-86-208.ngrok-free.app';
+const serverUrl = 'https://vast-words-exist.loca.lt';
 
 // Send a message to the Service Worker to load images from the cache
 function loadCapturedImages() {
@@ -134,8 +134,8 @@ const getApplicationServerKey = () => {
     
     return fetch(`${serverUrl}/key`, {
         headers: {
-            
-            'User-Agent': 'MyCustomUserAgent'  // Custom User-Agent to bypass warning page
+            "bypass-tunnel-reminder" : true,
+            // 'User-Agent': 'MyCustomUserAgent'  // Custom User-Agent to bypass warning page
         }
     })
     .then(res => {
