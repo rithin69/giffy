@@ -134,8 +134,8 @@ const getApplicationServerKey = () => {
     
     return fetch(`${serverUrl}/key`, {
         headers: {
-            'ngrok-skip-browser-warning': 'true',  // Skip Ngrok's browser warning page
-            // 'User-Agent': 'MyCustomUserAgent'  // Custom User-Agent to bypass warning page
+            // 'ngrok-skip-browser-warning': 'true',  // Skip Ngrok's browser warning page
+            'User-Agent': 'MyCustomUserAgent'  // Custom User-Agent to bypass warning page
         }
     })
     .then(res => {
