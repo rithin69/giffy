@@ -131,26 +131,39 @@ const urlBase64ToUint8Array = (base64String) => {
 
 const getApplicationServerKey = () => {
     console.log("Fetching VAPID Key from:", `${serverUrl}/key`);  // Log the fetch URL
-    return fetch(`${serverUrl}/key`)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.text();
-        })
-        .then(key => {
-            console.log("Fetched VAPID Key (Base64):", key);  // Log the fetched key
-            const uint8Key = urlBase64ToUint8Array(key);
-            if (!uint8Key) {
-                throw new Error('Invalid Base64 VAPID Key');
-            }
-            console.log("Converted VAPID Key (Uint8Array):", uint8Key);  // Log the Uint8Array
-            return uint8Key;
-        })
-        .catch(error => {
-            console.error("Failed to fetch or convert VAPID Key:", error);
-            throw error;  // Rethrow the error to be caught by the caller
-        });
+    
+    return fetch(`${serverUrl}/key`, {
+        headers: {
+            'ngrok-skip-browser-warning': 'true',  // Skip Ngrok's browser warning page
+            'User-Agent': 'MyCustomUserAgent'  // Custom User-Agent to bypass warning page
+        }
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.text();
+    })
+    .then(key => {
+        console.log("Fetched VAPID Key (Base64):", key);  // Log the fetched key
+        
+        // Log the conversion process
+        console.log("Converting Base64 to Uint8Array:", key);
+        
+        const uint8Key = urlBase64ToUint8Array(key);
+        
+        if (!uint8Key) {
+            throw new Error('Invalid Base64 VAPID Key');
+        }
+        
+        console.log("Converted VAPID Key (Uint8Array):", uint8Key);  // Log the Uint8Array
+        
+        return uint8Key;
+    })
+    .catch(error => {
+        console.error("Failed to fetch or convert VAPID Key:", error);
+        throw error;  // Rethrow the error to be caught by the caller
+    });
 };
 
 const unsubscribe = () => {
