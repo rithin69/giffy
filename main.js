@@ -1,6 +1,6 @@
 let swReg;
 
-const serverUrl = 'https://d85e-185-3-86-208.ngrok-free.app';
+const serverUrl = 'https://fd20-185-3-86-208.ngrok-free.app';
 
 // Send a message to the Service Worker to load images from the cache
 function loadCapturedImages() {
