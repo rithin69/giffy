@@ -166,6 +166,8 @@ const getApplicationServerKey = () => {
     });
 };
 
+
+
 const unsubscribe = () => {
     if (!swReg) return console.error('Service Worker Registration Not Found');
     swReg.pushManager.getSubscription().then(subscription => {
